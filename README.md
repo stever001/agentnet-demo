@@ -25,4 +25,118 @@ AgentNet is an open-source, AI-native web infrastructure project that enables we
    ```bash
    git clone https://github.com/stever001/agentnet-demo.git
    cd agentnet-demo
+   ```
 
+2. **Install root-level tools and concurrently**  
+   ```bash
+   npm install concurrently --save-dev
+   ```
+
+3. **Install backend dependencies**  
+   ```bash
+   cd backend
+   npm install
+   ```
+
+4. **Install frontend dependencies**  
+   ```bash
+   cd ../frontend
+   npm install
+   ```
+
+5. **Setup MySQL and create the database**  
+   ```sql
+   CREATE DATABASE agentnet;
+   ```
+
+6. **Configure backend environment variables**  
+   Create a `.env` file in the `backend` directory:
+   ```
+   DB_NAME=agentnet
+   DB_USER=your_mysql_username
+   DB_PASSWORD=your_mysql_password
+   ```
+
+7. **Configure root-level `package.json` (if not already set)**  
+   In the project root, add this to your `package.json`:
+   ```
+   {
+     "scripts": {
+       "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\""
+     }
+   }
+   ```
+
+## Usage  
+
+### Run the Development Servers  
+
+To start both frontend and backend servers simultaneously:
+
+```bash
+npm run dev
+```
+
+This command uses [`concurrently`](https://www.npmjs.com/package/concurrently) to run both the Express backend and Vite-powered frontend from the project root.
+
+Alternatively, you can run them separately:
+
+- **Backend**  
+  ```bash
+  cd backend
+  npm run dev
+  ```
+
+- **Frontend**  
+  ```bash
+  cd frontend
+  npm run dev
+  ```
+
+### Features in Development  
+- Agent publishing dashboard  
+- OpenAPI + JSON-LD integration for agents  
+- Node prioritization tools  
+- Publisher onboarding and analytics
+
+## License  
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)  
+This project is licensed under the MIT license.
+
+## Contributing  
+
+We welcome contributions from developers, researchers, and semantic web enthusiasts!
+
+**To contribute:**
+1. Fork the repository  
+2. Create a new feature branch  
+   ```bash
+   git checkout -b feature/my-feature
+   ```
+3. Commit your changes  
+   ```bash
+   git commit -m "Add my feature"
+   ```
+4. Push your branch  
+   ```bash
+   git push origin feature/my-feature
+   ```
+5. Open a pull request with a description of your changes
+
+Please use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) and ensure your code is clean and readable. We recommend using Prettier for formatting.
+
+## Tests  
+Test coverage is not yet implemented. Tests will be introduced once the API and data model stabilize. Planned coverage includes:
+- API endpoint unit tests (Jest)  
+- Frontend UI component testing (React Testing Library)  
+- DB validation and model integration tests
+
+## Questions  
+
+For questions or collaboration inquiries, please contact:
+
+**Steve Rouse**  
+Founder, AgentNet  
+📧 steve17rouse@gmail.com  
+🌐 [agent-net.ai](http://agent-net.ai) *(coming soon)*  
+📁 GitHub: [stever001](https://github.com/stever001)
