@@ -19,7 +19,7 @@ export default function Publish() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/publish`, {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/agents`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)

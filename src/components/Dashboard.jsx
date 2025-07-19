@@ -6,11 +6,22 @@ export default function Dashboard() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    fetch(`${baseURL}/api/agents`)
-      .then((res) => res.json())
-      .then((data) => setAgents(data))
-      .catch((err) => console.error('Error fetching agents:', err));
-  }, []);
+    const fetchAgents = async () => {
+      try {
+        const res = await fetch(`${baseURL}/api/agents`);
+        const data = await res.json();
+        setAgents(data);
+      } catch (err) {
+        console.error('Error fetching agents:', err);
+      }
+    };
+
+    fetchAgents(); // fetch once immediately
+
+    const intervalId = setInterval(fetchAgents, 5000); // fetch every 5 seconds
+
+    return () => clearInterval(intervalId); // cleanup on unmount
+  }, [baseURL]);
 
   return (
     <div style={{ padding: '1rem' }}>
@@ -22,6 +33,13 @@ export default function Dashboard() {
           {agents.map((agent) => (
             <li key={agent.id}>
               <strong>{agent.name}</strong>: {agent.description}
+              {agent.url && (
+                <div>
+                  <a href={agent.url} target="_blank" rel="noopener noreferrer">
+                    {agent.url}
+                  </a>
+                </div>
+              )}
             </li>
           ))}
         </ul>
@@ -29,3 +47,4 @@ export default function Dashboard() {
     </div>
   );
 }
+
