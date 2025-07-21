@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function App() {
   const [msg, setMsg] = useState('');
@@ -9,5 +10,17 @@ export default function App() {
       .then(data => setMsg(data.message));
   }, []);
 
-  return <h1>{msg || 'Loading...'}</h1>;
+  return (
+    <div className="p-6 text-center">
+      <h1 className="text-3xl font-bold mb-6">{msg || 'Loading...'}</h1>
+
+      <Link
+        to="/dashboard"
+        className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Go to Dashboard
+      </Link>
+    </div>
+  );
 }
+
