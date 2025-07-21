@@ -1,4 +1,4 @@
-// backend/models/Schema.js
+// models/Schema.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db');
 const Agent = require('./Agent');
@@ -12,25 +12,26 @@ const Schema = sequelize.define('Schema', {
   agentId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: {
-      model: Agent,
-      key: 'id',
-    },
   },
   type: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  jsonLd: {
-    type: DataTypes.TEXT('long'),
+  data: {
+    type: DataTypes.JSON,
     allowNull: false,
   },
-  label: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
+}, {
+  indexes: [
+    {
+      unique: true,
+      fields: ['agentId', 'type'],
+    }
+  ]
 });
 
-Schema.belongsTo(Agent, { foreignKey: 'agentId', onDelete: 'CASCADE' });
+// Set up associations
+Schema.belongsTo(Agent, { foreignKey: 'agentId' });
+Agent.hasMany(Schema, { foreignKey: 'agentId' });
 
 module.exports = Schema;

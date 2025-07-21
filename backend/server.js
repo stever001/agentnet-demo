@@ -4,12 +4,14 @@ const cors = require('cors');
 const sequelize = require('./db');
 const Agent = require('./models/Agent');
 const Schema = require('./models/Schema'); // ✅ import Schema model
+const botRouter = require('./api/botRouter');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 sequelize.sync().then(() => console.log('✅ Database synced'));
+app.use('/api/bot', botRouter); // ✅ Use bot router
 
 // Get all agents
 app.get('/api/agents', async (req, res) => {
@@ -59,6 +61,21 @@ app.post('/api/schemas', async (req, res) => {
     res.status(500).json({ error: 'Failed to save schema' });
   }
 });
+
+// Delete a schema by ID
+app.delete('/api/schemas/:id', async (req, res) => {
+  try {
+    const schema = await Schema.findByPk(req.params.id);
+    if (!schema) return res.status(404).json({ error: 'Schema not found' });
+
+    await schema.destroy();
+    res.json({ message: 'Schema deleted' });
+  } catch (err) {
+    console.error('Error deleting schema:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 const PORT = 4000;
 app.listen(PORT, () => {

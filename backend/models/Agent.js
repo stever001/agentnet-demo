@@ -1,3 +1,5 @@
+// backend/models/Agent.js
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db');
 
@@ -20,10 +22,13 @@ const Agent = sequelize.define('Agent', {
     allowNull: false,
   },
   slug: {
-    type: DataTypes.STRING, // Optional for public URLs
-    allowNull: true,
+    type: DataTypes.STRING,
+    allowNull: true, // Optional for public URLs
+  },
+  lastCrawledAt: {
+    type: DataTypes.DATE,
+    allowNull: true, // Will be null until first successful scan
   },
 });
 
 module.exports = Agent;
-// backend/models/Agent.js
