@@ -1,121 +1,166 @@
 import { useState } from 'react';
-import SchemaForm from './SchemaForm';
+import { useNavigate } from 'react-router-dom';
 
-export default function Publish() {
-  const [formData, setFormData] = useState({
-    name: '',
-    url: '',
-    description: ''
-  });
+const Publish = () => {
+  const [name, setName] = useState('');
+  const [url, setUrl] = useState('');
+  const [description, setDescription] = useState('');
+  const [ownerName, setOwnerName] = useState('');
+  const [ownerEmail, setOwnerEmail] = useState('');
+  const [organization, setOrganization] = useState('');
+  const [techContactEmail, setTechContactEmail] = useState('');
+  const [billingContactEmail, setBillingContactEmail] = useState('');
 
-  const [submitted, setSubmitted] = useState(false);
-  const [newAgentId, setNewAgentId] = useState(null);
-  const [agentMeta, setAgentMeta] = useState(null); // Store full agent info
-
-  const handleChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/agents`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData)
-    });
+    setError('');
+    setIsSubmitting(true);
 
-    if (res.ok) {
-  const data = await res.json();
-  setNewAgentId(data.id);
-  setAgentMeta({
-    ...formData,  // reuse input data
-    id: data.id   // add returned ID
-  });
-  setSubmitted(true);
-  setFormData({ name: '', url: '', description: '' });
-}
+    if (!name || !url || !description) {
+      setError('Name, URL, and description are required.');
+      setIsSubmitting(false);
+      return;
+    }
 
+    try {
+      const response = await fetch('/api/agents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          url,
+          description,
+          ownerName,
+          ownerEmail,
+          organization,
+          techContactEmail,
+          billingContactEmail,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Failed to publish agent.');
+      } else {
+        navigate(`/agents/${data.id}`);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Unexpected error. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Publish a New Agent</h1>
-
-      {submitted && (
-        <p className="text-green-600 mb-4">
-          Agent published successfully! Agent ID: {newAgentId}
-        </p>
-      )}
-
+    <div className="p-6 max-w-xl mx-auto">
+      <h2 className="text-2xl font-semibold mb-4">Publish a New Agent</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {error && <p className="text-red-500">{error}</p>}
+
         <div>
-          <label className="block font-medium mb-1">Agent Name:</label>
+          <label className="block mb-1 font-medium">Agent Name</label>
           <input
             type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
+            className="w-full border border-gray-300 rounded p-2"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. MarketBot"
             required
-            className="w-full border border-gray-300 p-2 rounded"
           />
         </div>
 
         <div>
-          <label className="block font-medium mb-1">Site URL:</label>
+          <label className="block mb-1 font-medium">Target URL</label>
           <input
             type="url"
-            name="url"
-            value={formData.url}
-            onChange={handleChange}
+            className="w-full border border-gray-300 rounded p-2"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://example.com"
             required
-            className="w-full border border-gray-300 p-2 rounded"
           />
         </div>
 
         <div>
-          <label className="block font-medium mb-1">Description:</label>
+          <label className="block mb-1 font-medium">Description</label>
           <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
+            className="w-full border border-gray-300 rounded p-2"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="What does this agent do?"
             required
-            className="w-full border border-gray-300 p-2 rounded"
+          />
+        </div>
+
+        <hr className="my-4" />
+        <h3 className="text-lg font-medium">Agent Profile Information</h3>
+
+        <div>
+          <label className="block mb-1 font-medium">Owner Name</label>
+          <input
+            type="text"
+            className="w-full border border-gray-300 rounded p-2"
+            value={ownerName}
+            onChange={(e) => setOwnerName(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1 font-medium">Owner Email</label>
+          <input
+            type="email"
+            className="w-full border border-gray-300 rounded p-2"
+            value={ownerEmail}
+            onChange={(e) => setOwnerEmail(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1 font-medium">Organization</label>
+          <input
+            type="text"
+            className="w-full border border-gray-300 rounded p-2"
+            value={organization}
+            onChange={(e) => setOrganization(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1 font-medium">Tech Contact Email</label>
+          <input
+            type="email"
+            className="w-full border border-gray-300 rounded p-2"
+            value={techContactEmail}
+            onChange={(e) => setTechContactEmail(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1 font-medium">Billing Contact Email</label>
+          <input
+            type="email"
+            className="w-full border border-gray-300 rounded p-2"
+            value={billingContactEmail}
+            onChange={(e) => setBillingContactEmail(e.target.value)}
           />
         </div>
 
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+          disabled={isSubmitting}
         >
-          Publish Agent
+          {isSubmitting ? 'Publishing...' : 'Publish Agent'}
         </button>
       </form>
-
-      {newAgentId && (
-        <>
-          <hr className="my-8 border-t border-gray-300" />
-          <h2 className="text-xl font-semibold mb-2">
-            Submit JSON-LD Schema for Agent #{newAgentId}
-          </h2>
-
-          {agentMeta && (
-            <div className="mb-4 p-4 bg-gray-50 border border-gray-300 rounded">
-              <p><strong>Name:</strong> {agentMeta.name}</p>
-              <p><strong>URL:</strong>{' '}
-                <a href={agentMeta.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                  {agentMeta.url}
-                </a>
-              </p>
-              <p><strong>Description:</strong> {agentMeta.description}</p>
-            </div>
-          )}
-
-          <SchemaForm agentId={newAgentId} />
-        </>
-      )}
     </div>
   );
-}
+};
+
+export default Publish;

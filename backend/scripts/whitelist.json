@@ -1,0 +1,127 @@
+[
+  {
+    "name": "Wikipedia",
+    "url": "https://wikipedia.org",
+    "description": "Encyclopedic knowledge base using structured article data."
+  },
+  {
+    "name": "Healthline",
+    "url": "https://healthline.com",
+    "description": "Medical and wellness articles with JSON-LD structure."
+  },
+  {
+    "name": "WebMD",
+    "url": "https://webmd.com",
+    "description": "Trusted source for medical symptoms, conditions, and treatments."
+  },
+  {
+    "name": "Stack Overflow",
+    "url": "https://stackoverflow.com",
+    "description": "Developer Q&A platform using Question schema."
+  },
+  {
+    "name": "GitHub",
+    "url": "https://github.com",
+    "description": "Code hosting platform with SoftwareSourceCode schema."
+  },
+  {
+    "name": "Kickstarter",
+    "url": "https://kickstarter.com",
+    "description": "Crowdfunding site with structured project data."
+  },
+  {
+    "name": "Indeed",
+    "url": "https://indeed.com",
+    "description": "Job listings with JobPosting schema."
+  },
+  {
+    "name": "Eventbrite",
+    "url": "https://eventbrite.com",
+    "description": "Events platform using JSON-LD Event schema."
+  },
+  {
+    "name": "Best Buy",
+    "url": "https://bestbuy.com",
+    "description": "Retail product listings using Product schema."
+  },
+  {
+    "name": "Target",
+    "url": "https://target.com",
+    "description": "E-commerce retailer with structured data for products."
+  },
+  {
+    "name": "Zillow",
+    "url": "https://zillow.com",
+    "description": "Real estate marketplace with Place and Offer schemas."
+  },
+  {
+    "name": "Realtor.com",
+    "url": "https://realtor.com",
+    "description": "Real estate listings using structured property data."
+  },
+  {
+    "name": "NASA",
+    "url": "https://nasa.gov",
+    "description": "Space and science data with structured news and mission info."
+  },
+  {
+    "name": "Data.gov",
+    "url": "https://data.gov",
+    "description": "U.S. government open data with JSON-LD metadata."
+  },
+  {
+    "name": "U.S. News",
+    "url": "https://usnews.com",
+    "description": "Education and news portal using NewsArticle schema."
+  },
+  {
+    "name": "TechCrunch",
+    "url": "https://techcrunch.com",
+    "description": "Tech industry news using Article and Organization schemas."
+  },
+  {
+    "name": "Forbes",
+    "url": "https://forbes.com",
+    "description": "Business news with structured data for financial articles."
+  },
+  {
+    "name": "Investopedia",
+    "url": "https://investopedia.com",
+    "description": "Financial education site using Article schema."
+  },
+  {
+    "name": "NerdWallet",
+    "url": "https://nerdwallet.com",
+    "description": "Financial product comparisons with structured reviews."
+  },
+  {
+    "name": "TripAdvisor",
+    "url": "https://tripadvisor.com",
+    "description": "Travel reviews and ratings using Place and Review schemas."
+  },
+  {
+    "name": "Booking.com",
+    "url": "https://booking.com",
+    "description": "Hotel and stay listings with JSON-LD Event and Place schemas."
+  },
+  {
+    "name": "Khan Academy",
+    "url": "https://khanacademy.org",
+    "description": "Educational resources with Course schema."
+  },
+  {
+    "name": "Coursera",
+    "url": "https://coursera.org",
+    "description": "Online courses using Course and Organization schemas."
+  },
+  {
+    "name": "Mozilla",
+    "url": "https://mozilla.org",
+    "description": "Open source organization with developer-focused JSON-LD."
+  },
+  {
+    "name": "NPM",
+    "url": "https://npmjs.com",
+    "description": "JavaScript package registry using SoftwareSourceCode schema."
+  }
+]

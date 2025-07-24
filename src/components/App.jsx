@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // ✅ Required for styles
 
 export default function App() {
   const [msg, setMsg] = useState('');
@@ -20,6 +22,9 @@ export default function App() {
       >
         Go to Dashboard
       </Link>
+
+      {/* ✅ Toast Notifications */}
+      <ToastContainer position="bottom-right" autoClose={4000} />
     </div>
   );
 }

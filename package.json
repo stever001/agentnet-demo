@@ -6,6 +6,9 @@
     "dev:client": "vite",
     "dev:server": "nodemon backend/server.js",
     "build": "vite build",
+    "retry-failed": "node backend/scripts/retryFailedCrawls.js",
+    "validate-models": "node backend/scripts/validateModels.js",
+    "import-whitelist": "node backend/scripts/importWhitelist.js",
     "preview": "vite preview"
   },
   "devDependencies": {
@@ -23,6 +26,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.7.0",
+    "react-toastify": "^11.0.5",
     "sequelize": "^6.37.7"
   }
 }

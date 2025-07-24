@@ -11,6 +11,11 @@ app.use(cors());
 app.use(express.json());
 
 sequelize.sync().then(() => console.log('✅ Database synced'));
+//sequelize.sync({ force: true }).then(() => console.log('⚠️ All tables dropped and recreated.'));
+
+// ✅ Tip: Use this only when you want to rebuild your schema from scratch (e.g. after model changes).
+//In production, use Sequelize migrations instead.
+
 app.use('/api/bot', botRouter); // ✅ Use bot router
 
 // Get all agents
@@ -19,15 +24,39 @@ app.get('/api/agents', async (req, res) => {
   res.json(agents);
 });
 
-// Create new agent
+// Create new agent and trigger crawl
+const { spawn } = require('child_process');
+const path = require('path');
+
 app.post('/api/agents', async (req, res) => {
   const { name, url, description } = req.body;
-  if (!name || !description) {
-    return res.status(400).json({ error: 'Name and description are required' });
+
+  if (!name || !url || !description) {
+    return res.status(400).json({ error: 'name, url, and description are required.' });
   }
-  const newAgent = await Agent.create({ name, url, description });
-  res.status(201).json(newAgent);
+
+  try {
+    // Prevent duplicate agent names
+    const existing = await Agent.findOne({ where: { name } });
+    if (existing) {
+      return res.status(400).json({ error: 'Agent name already exists.' });
+    }
+
+    const newAgent = await Agent.create({ name, url, description });
+
+    // 🔄 Trigger the crawl bot script
+    const scriptPath = path.resolve(__dirname, './bot/runBot.js');
+    const child = spawn('node', [scriptPath, newAgent.id, newAgent.url], {
+      stdio: 'inherit',
+    });
+
+    res.status(201).json(newAgent);
+  } catch (err) {
+    console.error('❌ Error creating agent:', err);
+    res.status(500).json({ error: 'Failed to create agent.' });
+  }
 });
+
 
 // Get a single agent and its schemas
 app.get('/api/agents/:id', async (req, res) => {
@@ -42,6 +71,44 @@ app.get('/api/agents/:id', async (req, res) => {
   } catch (err) {
     console.error('Error fetching agent:', err);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+app.post('/api/agents/:id/deactivate', async (req, res) => {
+  const { id } = req.params;
+  const { reason } = req.body;
+
+  try {
+    const agent = await Agent.findByPk(id);
+    if (!agent) return res.status(404).json({ error: 'Agent not found' });
+
+    agent.status = 'inactive';
+    agent.deactivatedAt = new Date();
+    agent.deactivationReason = reason || 'Unspecified';
+    await agent.save();
+
+    res.json({ message: 'Agent deactivated.', agent });
+  } catch (err) {
+    console.error('Error deactivating agent:', err);
+    res.status(500).json({ error: 'Failed to deactivate agent.' });
+  }
+});
+
+app.post('/api/agents/:id/reactivate', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const agent = await Agent.findByPk(id);
+    if (!agent) return res.status(404).json({ error: 'Agent not found' });
+
+    agent.status = 'active';
+    agent.deactivatedAt = null;
+    agent.deactivationReason = null;
+    await agent.save();
+
+    res.json({ message: 'Agent reactivated.', agent });
+  } catch (err) {
+    console.error('Error reactivating agent:', err);
+    res.status(500).json({ error: 'Failed to reactivate agent.' });
   }
 });
 

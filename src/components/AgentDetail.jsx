@@ -1,7 +1,10 @@
+// src/components/AgentDetail.jsx
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import AgentStatusToggle from './AgentStatusToggle';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-// Utility to get relative time string
 function getRelativeTime(dateString) {
   if (!dateString) return 'N/A';
   const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
@@ -32,7 +35,6 @@ export default function AgentDetail() {
   const { id } = useParams();
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
-  const [rescanStatus, setRescanStatus] = useState('');
   const [isRescanning, setIsRescanning] = useState(false);
 
   const fetchAgent = async () => {
@@ -51,39 +53,70 @@ export default function AgentDetail() {
   }, [id]);
 
   const handleRescan = async () => {
-    setRescanStatus('⏳ Rescanning...');
     setIsRescanning(true);
+    toast.info('⏳ Rescanning site...', { autoClose: 2000 });
 
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/bot/rescan/${id}`, {
         method: 'POST',
       });
 
-      if (!res.ok) throw new Error('Failed to trigger bot');
-      setRescanStatus('✅ Rescan started');
+      if (!res.ok) {
+        toast.error('❌ Rescan failed – check agent status');
+        throw new Error('Failed to trigger bot');
+      }
 
-      // Give bot time to complete, then refresh data
-      setTimeout(() => {
-        fetchAgent();
-        setRescanStatus('');
-        setIsRescanning(false);
-      }, 3000);
+      toast.success('✅ Rescan triggered');
     } catch (err) {
       console.error(err);
-      setRescanStatus('❌ Error triggering rescan');
-      setIsRescanning(false);
+      toast.error('❌ Error triggering rescan');
+    } finally {
+      // Always refresh agent status after rescan
+      setTimeout(() => {
+        fetchAgent();
+        setIsRescanning(false);
+      }, 3000);
+    }
+  };
+
+  const handleStatusChange = async (newStatus, reason = '') => {
+    const endpoint = newStatus === 'inactive' ? 'deactivate' : 'reactivate';
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/agents/${id}/${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason }),
+      });
+
+      if (!res.ok) throw new Error();
+      toast.success(`✅ Agent ${newStatus === 'inactive' ? 'deactivated' : 'reactivated'}`);
+      setTimeout(() => fetchAgent(), 1500);
+    } catch (err) {
+      toast.error(`❌ Failed to ${endpoint} agent`);
     }
   };
 
   if (error) return <div className="p-6 text-red-500">{error}</div>;
   if (!data) return <div className="p-6">Loading...</div>;
 
-  const { agent, schemas } = data;
+  const { agent, schemas = [] } = data;
 
   return (
     <div className="p-6">
+      <ToastContainer position="top-center" />
       <h1 className="text-2xl font-bold mb-2">{agent.name}</h1>
       <p className="text-gray-700 mb-2">{agent.description}</p>
+
+      {agent.status === 'inactive' && (
+        <div className="mb-3 p-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
+          <strong>Inactive</strong>{' '}
+          {agent.deactivationReason && <>– {agent.deactivationReason}</>}
+          {agent.deactivatedAt && (
+            <span className="ml-1 text-sm">({getRelativeTime(agent.deactivatedAt)})</span>
+          )}
+        </div>
+      )}
 
       {agent.lastCrawledAt && (
         <p className="text-sm text-gray-500 mb-1">
@@ -113,11 +146,10 @@ export default function AgentDetail() {
       >
         {isRescanning ? '🔄 Rescanning...' : '🔁 Rescan Agent'}
       </button>
-      {rescanStatus && <p className="text-sm text-gray-600 mb-4">{rescanStatus}</p>}
 
-      <h2 className="text-xl font-semibold mb-2">
-        Schemas ({schemas.length})
-      </h2>
+      <AgentStatusToggle agent={agent} onChange={handleStatusChange} />
+
+      <h2 className="text-xl font-semibold mt-6 mb-2">Schemas ({schemas.length})</h2>
 
       {schemas.length === 0 ? (
         <p className="text-gray-500">No schemas submitted.</p>
